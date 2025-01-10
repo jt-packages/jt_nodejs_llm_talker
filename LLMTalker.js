@@ -50,7 +50,7 @@ class LLMTalker {
     return tokenCount;
   }
 
-  getMessagesWithinTokenLimit({ topPromptMessages = [], addTopPromptMessages = true }) {
+  getMessagesWithinTokenLimit({ topPromptMessages = [], addTopPromptMessages = true, tokenLimitDeduction = 0, messageLimitDeduction = 0 }) {
     // keep up to "this.maxMessages" messages, and up to "this.maxTokens" tokens.
     const activeTokenLimit = this.maxTokens - tokenLimitDeduction;
     const activeMessageLimit = this.maxMessages - messageLimitDeduction;
@@ -98,13 +98,19 @@ class LLMTalker {
    */
   async sendMessage({ messageString, requirePreprocessing = true }) {
     try {
-      const userMessage = createMessage({ messageString, role: "user" });
+      const userMessage = LLMTalker.createMessage({ messageString, role: "user" });
       this.messages.push(userMessage);
       let sendingMessages = this.messages;
+      console.log("requirePreprocessing: ", requirePreprocessing);
       if (requirePreprocessing) {
-        sendingMessages = this.getMessagesWithinTokenLimit(createMessage({ messageString: this.promptString, role: "system" }));
+        console.log("now preprocessing");
+        sendingMessages = this.getMessagesWithinTokenLimit({
+          topPromptMessages: [
+            LLMTalker.createMessage({ messageString: this.promptString, role: "system" }),
+          ],
+        });
       }
-      // console.log("the messages: ", this.messages);
+      console.log("sendingMessages: ", sendingMessages);
 
       // Make the API request
       const response = await axios.post(
@@ -122,7 +128,7 @@ class LLMTalker {
       );
 
       const reply = response.data.choices[0].message.content;
-      const assistantMessage = createMessage({ messageString: reply, role: "assistant" });
+      const assistantMessage = LLMTalker.createMessage({ messageString: reply, role: "assistant" });
       this.messages.push(assistantMessage);
 
       return assistantMessage;
