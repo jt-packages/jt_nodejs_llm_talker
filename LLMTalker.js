@@ -96,10 +96,12 @@ class LLMTalker {
    * @param {string} options.messageString - The user message to send.
    * @returns {Promise<Array>} - The updated list of messages.
    */
-  async sendMessage({ messageString, requirePreprocessing = true }) {
+  async sendMessage({ newMessage = null, requirePreprocessing = true }) {
     try {
-      const userMessage = LLMTalker.createMessage({ messageString, role: "user" });
-      this.messages.push(userMessage);
+      if (newMessage) {
+        // this is in case of the new message is not already in the messages.
+        this.messages.push(newMessage);
+      }
       let sendingMessages = this.messages;
       console.log("requirePreprocessing: ", requirePreprocessing);
       if (requirePreprocessing) {
