@@ -1,0 +1,11 @@
+{
+  "name": "jt_nodejs_llm_talker",
+  "version": "1.0.0",
+  "description": "A script that allow you to talk to a LLM service",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Weiyan Tao (JT)",
+  "license": "MIT"
+}
